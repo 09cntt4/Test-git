@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<title>Web Order Sản Phẩm</title>
+
+<style>
+    body {
+        margin: 0;
+        font-family: Arial, sans-serif;
+        display: flex;
+        flex-direction: column;
+        height: 100vh;
+    }
+
+    /* Thanh danh mục */
+    header {
+        background: #007bff;
+        color: white;
+        padding: 15px;
+        display: flex;
+        gap: 20px;
+        font-size: 18px;
+    }
+
+    /* Khu vực chính chia 2 cột */
+    .container {
+        display: flex;
+        flex: 1;
+    }
+
+    /* Giỏ hàng bên trái */
+    .cart {
+        width: 25%;
+        background: #f8f9fa;
+        padding: 20px;
+        border-right: 1px solid #ddd;
+    }
+
+    /* Danh sách sản phẩm bên phải */
+    .products {
+    flex: 1;
+    padding: 20px;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 25px;
+}
+
+.item {
+    background: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    padding: 15px;
+    text-align: center;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.item:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 7px 18px rgba(0,0,0,0.15);
+}
+
+.item img {
+    width: 100%;
+    height: 150px;
+    object-fit: cover;
+    border-radius: 10px;
+}
+
+.item h3 {
+    margin: 10px 0 5px;
+    font-size: 20px;
+}
+
+.item p {
+    font-size: 18px;
+    color: #555;
+}
+
+.item button {
+    margin-top: 10px;
+    padding: 10px 15px;
+    border: none;
+    background: #ff5722;
+    color: white;
+    cursor: pointer;
+    border-radius: 8px;
+    font-size: 15px;
+    transition: 0.2s;
+}
+
+.item button:hover {
+    background: #e64a19;
+}
+
+
+ .cart {
+    width: 30%;
+    background: #ffffff;
+    padding: 20px;
+    border-right: 1px solid #ddd;
+}
+
+.cart h2 {
+    margin-top: 0;
+    text-align: center;
+    font-size: 22px;
+}
+
+.cart table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+    font-size: 15px;
+}
+
+.cart table th {
+    background: #007bff;
+    color: white;
+    padding: 8px;
+}
+
+.cart table td {
+    border-bottom: 1px solid #ddd;
+    padding: 6px;
+    text-align: center;
+}
+
+.qty-btn {
+    background: #007bff;
+    color: white;
+    padding: 2px 6px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.qty-btn:hover {
+    background: #0056b3;
+}
+
+.remove-btn {
+    background: #dc3545;
+    color: white;
+    padding: 4px 8px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.remove-btn:hover {
+    background: #b52a37;
+}
+
+.total-box {
+    margin-top: 12px;
+    font-size: 18px;
+    text-align: right;
+    font-weight: bold;
+}
+.print-btn {
+    width: 100%;
+    margin-top: 15px;
+    padding: 10px;
+    background: #28a745;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+.print-btn:hover {
+    background: #218838;
+}
+
+</style>
+</head>
+<div id="bill" style="display:none; font-family: Arial;">
+    <h2>HÓA ĐƠN THANH TOÁN</h2>
+    <div id="bill-content"></div>
+    <p><strong>Tổng cộng: <span id="bill-total"></span>₫</strong></p>
+    <p>Xin cảm ơn quý khách!</p>
+</div>
+
+<body>
+
+<header>
+    <div>🍔 Thức ăn</div>
+    <div>🥤 Nước uống</div>
+    <div>🍰 Tráng miệng</div>
+</header>
+
+<div class="container">
+
+    <!-- Giỏ hàng bên trái -->
+  <div class="cart">
+    <h2>🛒 Giỏ hàng</h2>
+
+    <table>
+        <thead>
+            <tr>
+                <th>STT</th>
+                <th>Sản phẩm</th>
+                <th>SL</th>
+                <th>Giá</th>
+                <th>Xóa</th>
+            </tr>
+        </thead>
+        <tbody id="cart-list"></tbody>
+    </table>
+
+    <div class="total-box">
+        Tổng: <span id="total">0</span>₫
+    </div>
+    <button class="print-btn" onclick="printBill()">🖨️ In hóa đơn</button>
+
+</div>
+
+
+    <!-- Danh sách sản phẩm bên phải -->
+    <div class="products">
+    <div class="item">
+        <img src="https://i.imgur.com/4ZQZ4Yy.jpeg" alt="Hamburger">
+        <h3>Hamburger</h3>
+        <p>35.000₫</p>
+        <button onclick="addToCart('Hamburger', 35000)">Thêm vào giỏ</button>
+    </div>
+
+    <div class="item">
+        <img src="https://i.imgur.com/NTe1Sqv.jpeg" alt="Trà sữa">
+        <h3>Trà sữa</h3>
+        <p>25.000₫</p>
+        <button onclick="addToCart('Trà sữa', 25000)">Thêm vào giỏ</button>
+    </div>
+
+    <div class="item">
+        <img src="https://i.imgur.com/Gm4J6sx.jpeg" alt="Khoai tây chiên">
+        <h3>Khoai tây chiên</h3>
+        <p>20.000₫</p>
+        <button onclick="addToCart('Khoai tây chiên', 20000)">Thêm vào giỏ</button>
+    </div>
+
+    <div class="item">
+        <img src="https://i.imgur.com/OxPpYKn.jpeg" alt="Bánh ngọt">
+        <h3>Bánh ngọt</h3>
+        <p>30.000₫</p>
+        <button onclick="addToCart('Bánh ngọt', 30000)">Thêm vào giỏ</button>
+    </div>
+    <div class="item">
+        <img src="https://i.imgur.com/OxPpYKn.jpeg" alt="Bánh ngọt">
+        <h3>Bánh ngọt</h3>
+        <p>30.000₫</p>
+        <button onclick="addToCart('Bánh ngọt', 30000)">Thêm vào giỏ</button>
+    </div>
+    <div class="item">
+        <img src="https://i.imgur.com/OxPpYKn.jpeg" alt="Bánh ngọt">
+        <h3>Bánh ngọt</h3>
+        <p>30.000₫</p>
+        <button onclick="addToCart('Bánh ngọt', 30000)">Thêm vào giỏ</button>
+    </div>
+    <div class="item">
+        <img src="https://i.imgur.com/OxPpYKn.jpeg" alt="Bánh ngọt">
+        <h3>Bánh ngọt</h3>
+        <p>30.000₫</p>
+        <button onclick="addToCart('Bánh ngọt', 30000)">Thêm vào giỏ</button>
+    </div>
+    <div class="item">
+        <img src="https://i.imgur.com/OxPpYKn.jpeg" alt="Bánh ngọt">
+        <h3>Bánh ngọt</h3>
+        <p>30.000₫</p>
+        <button onclick="addToCart('Bánh ngọt', 30000)">Thêm vào giỏ</button>
+    </div>
+    <div class="item">
+        <img src="https://i.imgur.com/OxPpYKn.jpeg" alt="Bánh ngọt">
+        <h3>Bánh ngọt</h3>
+        <p>30.000₫</p>
+        <button onclick="addToCart('Bánh ngọt', 30000)">Thêm vào giỏ</button>
+    </div>
+    <div class="item">
+        <img src="https://i.imgur.com/OxPpYKn.jpeg" alt="Bánh ngọt">
+        <h3>Bánh ngọt</h3>
+        <p>30.000₫</p>
+        <button onclick="addToCart('Bánh ngọt', 30000)">Thêm vào giỏ</button>
+    </div>
+    <div class="item">
+        <img src="https://i.imgur.com/OxPpYKn.jpeg" alt="Bánh ngọt">
+        <h3>Bánh ngọt</h3>
+        <p>30.000₫</p>
+        <button onclick="addToCart('Bánh ngọt', 30000)">Thêm vào giỏ</button>
+    </div>
+    <div class="item">
+        <img src="https://i.imgur.com/OxPpYKn.jpeg" alt="Bánh ngọt">
+        <h3>Bánh ngọt</h3>
+        <p>30.000₫</p>
+        <button onclick="addToCart('Bánh ngọt', 30000)">Thêm vào giỏ</button>
+    </div>
+
+</div>
+
+</div>
+<script src="js.js" ></script>
+<script>
+    let cart = [];
+
+function addToCart(name, price) {
+    let item = cart.find(x => x.name === name);
+
+    if (item) {
+        item.qty++;
+    } else {
+        cart.push({ name, price, qty: 1 });
+    }
+
+    renderCart();
+}
+
+function renderCart() {
+    const cartList = document.getElementById("cart-list");
+    const total = document.getElementById("total");
+    cartList.innerHTML = "";
+
+    let sum = 0;
+
+    cart.forEach((item, index) => {
+        let subtotal = item.price * item.qty;
+        sum += subtotal;
+
+        cartList.innerHTML += `
+            <tr>
+                <td>${index + 1}</td>
+                <td>${item.name}</td>
+                <td>
+                    <button class="qty-btn" onclick="changeQty(${index}, -1)">-</button>
+                    ${item.qty}
+                    <button class="qty-btn" onclick="changeQty(${index}, 1)">+</button>
+                </td>
+                <td>${subtotal.toLocaleString()}₫</td>
+                <td>
+                    <button class="remove-btn" onclick="removeItem(${index})">X</button>
+                </td>
+            </tr>
+        `;
+    });
+
+    total.innerText = sum.toLocaleString();
+}
+
+function changeQty(index, amount) {
+    cart[index].qty += amount;
+
+    if (cart[index].qty <= 0) cart.splice(index, 1);
+
+    renderCart();
+}
+
+function removeItem(index) {
+    cart.splice(index, 1);
+    renderCart();
+}
+
+
+
+
+</script>
+
+</body>
+</html>
